@@ -114,6 +114,8 @@ export default function ColorBends({
   const containerRef = useRef(null);
   const rendererRef = useRef(null);
   const rafRef = useRef(null);
+  const startTimeRef = useRef(performance.now());
+  const lastTimeRef = useRef(performance.now());
   const materialRef = useRef(null);
   const resizeObserverRef = useRef(null);
   const rotationRef = useRef(rotation);
@@ -170,8 +172,6 @@ export default function ColorBends({
     renderer.domElement.style.display = 'block';
     container.appendChild(renderer.domElement);
 
-    const clock = new THREE.Clock();
-
     const handleResize = () => {
       const w = container.clientWidth || 1;
       const h = container.clientHeight || 1;
@@ -190,8 +190,10 @@ export default function ColorBends({
     }
 
     const loop = () => {
-      const dt = clock.getDelta();
-      const elapsed = clock.elapsedTime;
+      const now = performance.now();
+      const dt = (now - lastTimeRef.current) / 1000;
+      lastTimeRef.current = now;
+      const elapsed = (now - startTimeRef.current) / 1000;
       material.uniforms.uTime.value = elapsed;
 
       const deg = (rotationRef.current % 360) + autoRotateRef.current * elapsed;
